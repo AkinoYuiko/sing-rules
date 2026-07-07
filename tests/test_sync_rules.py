@@ -90,6 +90,8 @@ class NamingTests(unittest.TestCase):
 
     def test_applies_name_overrides(self) -> None:
         self.assertEqual(to_snake_case("YouTube"), "youtube")
+        self.assertEqual(to_snake_case("Tiktok"), "tiktok")
+        self.assertEqual(to_snake_case("iCloud"), "icloud")
 
 
 class GenerateRuleArtifactsTests(unittest.TestCase):
