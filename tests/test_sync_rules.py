@@ -88,6 +88,9 @@ class NamingTests(unittest.TestCase):
         self.assertEqual(to_snake_case("AppleCDN"), "apple_cdn")
         self.assertEqual(to_snake_case("AI"), "ai")
 
+    def test_applies_name_overrides(self) -> None:
+        self.assertEqual(to_snake_case("YouTube"), "youtube")
+
 
 class GenerateRuleArtifactsTests(unittest.TestCase):
     def test_generates_json_srs_and_manifest(self) -> None:

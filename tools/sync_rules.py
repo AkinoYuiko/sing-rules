@@ -11,6 +11,9 @@ from typing import Any
 RULE_SET_VERSION = 3
 DEFAULT_MANIFEST_NAME = ".generated-files.txt"
 IGNORED_SOURCE_FILES = {"boost.lsr"}
+NAME_OVERRIDES = {
+    "YouTube": "youtube",
+}
 SIMPLE_RULE_TYPES = {
     "DOMAIN": "domain",
     "DOMAIN-SUFFIX": "domain_suffix",
@@ -187,6 +190,10 @@ def write_manifest(output_dir: Path, manifest_name: str, generated_files: list[P
 
 
 def to_snake_case(name: str) -> str:
+    overridden = NAME_OVERRIDES.get(name)
+    if overridden is not None:
+        return overridden
+
     first_pass = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", name)
     second_pass = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", first_pass)
     return second_pass.replace("-", "_").lower()

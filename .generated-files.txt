@@ -42,5 +42,5 @@ tiktok.json
 tiktok.srs
 twitter.json
 twitter.srs
-you_tube.json
-you_tube.srs
+youtube.json
+youtube.srs
