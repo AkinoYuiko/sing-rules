@@ -1,0 +1,50 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "apple.imap.mail.yahoo.com"
+      ]
+    },
+    {
+      "domain": [
+        "apple.smtp.mail.yahoo.com"
+      ]
+    },
+    {
+      "domain": [
+        "imap-mail.outlook.com"
+      ]
+    },
+    {
+      "domain": [
+        "outlook.office365.com"
+      ]
+    },
+    {
+      "domain": [
+        "smtp-mail.outlook.com"
+      ]
+    },
+    {
+      "domain": [
+        "smtp.office365.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".gmail.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".m.hotmail.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".mail.me.com"
+      ]
+    }
+  ]
+}

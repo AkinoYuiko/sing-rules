@@ -1,0 +1,65 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain_suffix": [
+        ".periscope.tv"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".pscp.tv"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".t.co"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".twimg.co"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".twimg.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".twimg.org"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".twitpic.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".twitter.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".twitter.jp"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".vine.co"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".x.com"
+      ]
+    },
+    {
+      "domain_keyword": [
+        "twitter"
+      ]
+    }
+  ]
+}

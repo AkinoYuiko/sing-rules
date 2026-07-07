@@ -1,0 +1,110 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "p16-tiktokcdn-com.akamaized.net"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".byteoversea.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".muscdn.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".musical.ly"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tik-tokapi.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktok.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokcdn-eu.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokcdn-us.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokcdn.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokd.net"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokd.org"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokeu-cdn.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokrow-cdn.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokv.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokv.eu"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokv.us"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokw.eu"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tiktokw.us"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".ttlivecdn.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".ttoverseaus.net"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".ttwstatic.com"
+      ]
+    }
+  ]
+}

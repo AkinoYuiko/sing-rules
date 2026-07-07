@@ -1,0 +1,30 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "applemusic.com"
+      ]
+    },
+    {
+      "domain": [
+        "xp.apple.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".itunes.apple.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".music.apple.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".mzstatic.com"
+      ]
+    }
+  ]
+}

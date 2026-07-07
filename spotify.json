@@ -1,0 +1,120 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "audio-ak-spotify-com.akamaized.net"
+      ]
+    },
+    {
+      "domain": [
+        "audio4-ak-spotify-com.akamaized.net"
+      ]
+    },
+    {
+      "domain": [
+        "cdn-spotify-experiments.conductrics.com"
+      ]
+    },
+    {
+      "domain": [
+        "heads-ak-spotify-com.akamaized.net"
+      ]
+    },
+    {
+      "domain": [
+        "heads4-ak-spotify-com.akamaized.net"
+      ]
+    },
+    {
+      "domain": [
+        "spotify.com.edgesuite.net"
+      ]
+    },
+    {
+      "domain": [
+        "spotify.map.fastly.net"
+      ]
+    },
+    {
+      "domain": [
+        "spotify.map.fastlylb.net"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".byspotify.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".pscdn.co"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".scdn.co"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spoti.fi"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotify-everywhere.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotify.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotify.design"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotifycdn.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotifycdn.net"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotifycharts.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotifycodes.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotifyforbrands.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotifyjobs.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".spotify.link"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".tospotify.com"
+      ]
+    }
+  ]
+}

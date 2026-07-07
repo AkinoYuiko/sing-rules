@@ -1,0 +1,130 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain_suffix": [
+        ".aaplimg.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".apple-cloudkit.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".apple-dns.net"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".apple-mapkit.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".apple.co"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".apple.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".apple.news"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".appsto.re"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".appstore.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".cdn-apple.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".icloud-content.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".icloud.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".itunes.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".me.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".organicfruitapps.com"
+      ]
+    },
+    {
+      "domain_suffix": [
+        ".push-apple.com.akadns.net"
+      ]
+    },
+    {
+      "process_name": [
+        "CoreLocationAgent"
+      ]
+    },
+    {
+      "process_name": [
+        "WeatherWidget"
+      ]
+    },
+    {
+      "process_name": [
+        "apsd"
+      ]
+    },
+    {
+      "process_name": [
+        "com.apple.Maps"
+      ]
+    },
+    {
+      "process_name": [
+        "com.apple.geod"
+      ]
+    },
+    {
+      "process_name": [
+        "findmydevice-user-agent"
+      ]
+    },
+    {
+      "process_name": [
+        "fmfd"
+      ]
+    },
+    {
+      "process_name": [
+        "mapspushd"
+      ]
+    },
+    {
+      "ip_cidr": [
+        "17.0.0.0/8"
+      ]
+    }
+  ]
+}
