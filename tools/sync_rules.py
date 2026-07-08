@@ -151,8 +151,32 @@ def parse_logical_expression(mode: str, body: str) -> tuple[dict[str, Any], None
     return {"type": "logical", "mode": mode, "rules": rules}, None
 
 
+def is_aggregatable_simple_rule(rule: dict[str, Any]) -> bool:
+    return "type" not in rule and len(rule) == 1
+
+
+def flush_grouped_simple_rules(grouped_rules: list[dict[str, Any]], output_rules: list[dict[str, Any]]) -> None:
+    if not grouped_rules:
+        return
+
+    merged_values: dict[str, list[Any]] = {}
+    field_order: list[str] = []
+    for rule in grouped_rules:
+        field, values = next(iter(rule.items()))
+        if field not in merged_values:
+            merged_values[field] = []
+            field_order.append(field)
+        merged_values[field].extend(values)
+
+    for field in field_order:
+        output_rules.append({field: merged_values[field]})
+
+    grouped_rules.clear()
+
+
 def convert_lsr_content(content: str, source_name: str) -> tuple[dict[str, Any], list[str]]:
     rules: list[dict[str, Any]] = []
+    grouped_simple_rules: list[dict[str, Any]] = []
     unsupported_entries: list[str] = []
 
     for line_number, raw_line in enumerate(content.splitlines(), start=1):
@@ -170,10 +194,15 @@ def convert_lsr_content(content: str, source_name: str) -> tuple[dict[str, Any],
             raise ConversionError(f"{source_name}:{line_number}: {exc}") from exc
 
         if rule is not None:
-            rules.append(rule)
+            if is_aggregatable_simple_rule(rule):
+                grouped_simple_rules.append(rule)
+            else:
+                flush_grouped_simple_rules(grouped_simple_rules, rules)
+                rules.append(rule)
         if unsupported is not None:
             unsupported_entries.append(f"{source_name}:{line_number}: {unsupported}")
 
+    flush_grouped_simple_rules(grouped_simple_rules, rules)
     return {"version": RULE_SET_VERSION, "rules": rules}, unsupported_entries
 
 
