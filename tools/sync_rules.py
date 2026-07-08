@@ -166,9 +166,8 @@ def is_aggregatable_simple_rule(rule: dict[str, Any]) -> bool:
     return "type" not in rule and len(rule) == 1
 
 
-def domain_sort_key(value: str) -> tuple[tuple[str, ...], str]:
-    labels = tuple(reversed(value.casefold().split(".")))
-    return labels, value
+def string_sort_key(value: str) -> str:
+    return value.casefold()
 
 
 def keyword_sort_key(value: str) -> str:
@@ -185,14 +184,19 @@ def ip_cidr_sort_key(value: str) -> tuple[int, int, int, str]:
     return (network.version, int(network.network_address), network.prefixlen, value)
 
 
+def deduplicate_values(values: list[Any]) -> list[Any]:
+    return list(dict.fromkeys(values))
+
+
 def sort_grouped_values(field: str, values: list[Any]) -> list[Any]:
+    unique_values = deduplicate_values(values)
     if field in {"domain", "domain_suffix"}:
-        return sorted(values, key=domain_sort_key)
+        return sorted(unique_values, key=string_sort_key)
     if field in {"domain_keyword", "domain_regex", "process_name"}:
-        return sorted(values, key=keyword_sort_key)
+        return sorted(unique_values, key=keyword_sort_key)
     if field == "ip_cidr":
-        return sorted(values, key=ip_cidr_sort_key)
-    return values
+        return sorted(unique_values, key=ip_cidr_sort_key)
+    return unique_values
 
 
 def flush_grouped_simple_rules(grouped_rules: list[dict[str, Any]], output_rules: list[dict[str, Any]]) -> None:

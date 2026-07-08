@@ -15,24 +15,29 @@ from tools.sync_rules import (
 
 
 class ConvertLsrContentTests(unittest.TestCase):
-    def test_sorts_grouped_values_within_each_category(self) -> None:
+    def test_sorts_and_deduplicates_grouped_values_within_each_category(self) -> None:
         payload = textwrap.dedent(
             """
             DOMAIN,test.apple.com
             DOMAIN,google.com
             DOMAIN,apple.com
             DOMAIN,cdn.apple.com
+            DOMAIN,apple.com
             DOMAIN-SUFFIX,google.com
             DOMAIN-SUFFIX,cdn.apple.com
             DOMAIN-SUFFIX,apple.com
+            DOMAIN-SUFFIX,apple.com
             DOMAIN-KEYWORD,zeta
+            DOMAIN-KEYWORD,alpha
             DOMAIN-KEYWORD,alpha
             IP-CIDR6,2001:db8::/48
             IP-CIDR,17.0.0.0/8
             IP-CIDR,10.0.0.0/24
             IP-CIDR,10.0.0.0/8
+            IP-CIDR,10.0.0.0/8
             IP-CIDR6,2001:db8::/32
             PROCESS-NAME,zsh
+            PROCESS-NAME,curl
             PROCESS-NAME,curl
             """
         )
@@ -44,7 +49,7 @@ class ConvertLsrContentTests(unittest.TestCase):
             {
                 "version": 3,
                 "rules": [
-                    {"domain": ["apple.com", "cdn.apple.com", "test.apple.com", "google.com"]},
+                    {"domain": ["apple.com", "cdn.apple.com", "google.com", "test.apple.com"]},
                     {"domain_suffix": ["apple.com", "cdn.apple.com", "google.com"]},
                     {"domain_keyword": ["alpha", "zeta"]},
                     {"ip_cidr": ["10.0.0.0/8", "10.0.0.0/24", "17.0.0.0/8", "2001:db8::/32", "2001:db8::/48"]},
