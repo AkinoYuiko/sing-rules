@@ -14,7 +14,7 @@ DEFAULT_MANIFEST_NAME = ".generated-files.txt"
 IGNORED_SOURCE_FILES = {"boost.lsr"}
 NAME_OVERRIDES = {
     "YouTube": "youtube",
-    "Tiktok": "tiktok",
+    "TikTok": "tiktok",
     "iCloud": "icloud",
 }
 SIMPLE_RULE_TYPES = {
