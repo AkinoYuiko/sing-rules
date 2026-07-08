@@ -1,0 +1,71 @@
+name: Sync sing-box rules
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Download sing-box
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/bin" "$RUNNER_TEMP/sing-box"
+          asset_url=$(gh api repos/SagerNet/sing-box/releases/latest --jq '.assets[] | select(.name | test("^sing-box-[0-9.]+-linux-amd64\\.tar\\.gz$")) | .browser_download_url')
+          curl -fsSL "$asset_url" -o "$RUNNER_TEMP/sing-box/sing-box.tar.gz"
+          tar -xzf "$RUNNER_TEMP/sing-box/sing-box.tar.gz" -C "$RUNNER_TEMP/sing-box"
+          install -m 0755 "$(find "$RUNNER_TEMP/sing-box" -type f -name sing-box | head -n 1)" "$RUNNER_TEMP/bin/sing-box"
+          "$RUNNER_TEMP/bin/sing-box" version
+
+      - name: Clone upstream rules
+        env:
+          UPSTREAM_REPO: ${{ secrets.UPSTREAM_REPO }}
+        run: |
+          set -euo pipefail
+          test -n "$UPSTREAM_REPO"
+          git clone --depth=1 "$UPSTREAM_REPO" "$RUNNER_TEMP/upstream-rules"
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Generate artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/artifacts"
+          python -m tools.sync_rules \
+            --source-dir "$RUNNER_TEMP/upstream-rules" \
+            --output-dir "$RUNNER_TEMP/artifacts" \
+            --sing-box "$RUNNER_TEMP/bin/sing-box" \
+            --clean
+          rm -f "$RUNNER_TEMP/artifacts/.generated-files.txt"
+
+      - name: Publish release branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x tools/publish_release_branch.sh
+          tools/publish_release_branch.sh \
+            --artifacts-dir "$RUNNER_TEMP/artifacts" \
+            --repo "$GITHUB_REPOSITORY" \
+            --token "$GITHUB_TOKEN" \
+            --branch release \
+            --commit-message "chore: publish rule artifacts"
