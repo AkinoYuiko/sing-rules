@@ -37,8 +37,8 @@ class ConvertLsrContentTests(unittest.TestCase):
                 "version": 3,
                 "rules": [
                     {"domain": ["example.com", "example.net"]},
-                    {"domain_keyword": ["openai"]},
                     {"domain_suffix": ["example.org"]},
+                    {"domain_keyword": ["openai"]},
                     {"ip_cidr": ["10.0.0.0/24", "2001:db8::/32"]},
                     {"process_name": ["curl"]},
                 ],
@@ -46,7 +46,7 @@ class ConvertLsrContentTests(unittest.TestCase):
         )
         self.assertEqual(unsupported, [])
 
-    def test_sorts_by_rule_type_before_grouping_simple_rules(self) -> None:
+    def test_sorts_by_category_before_grouping_simple_rules(self) -> None:
         payload = textwrap.dedent(
             """
             DOMAIN,example.com // comment
@@ -64,6 +64,8 @@ class ConvertLsrContentTests(unittest.TestCase):
             {
                 "version": 3,
                 "rules": [
+                    {"domain": ["example.com", "example.net"]},
+                    {"domain_suffix": ["example.org", "example.edu"]},
                     {
                         "type": "logical",
                         "mode": "and",
@@ -72,8 +74,6 @@ class ConvertLsrContentTests(unittest.TestCase):
                             {"domain_suffix": ["azurefd.net"]},
                         ],
                     },
-                    {"domain": ["example.com", "example.net"]},
-                    {"domain_suffix": ["example.org", "example.edu"]},
                 ],
             },
         )

@@ -30,6 +30,18 @@ IGNORED_RULE_TYPES = {
 UNSUPPORTED_RULE_TYPES = {
     "URL-REGEX",
 }
+RULE_TYPE_ORDER = {
+    "DOMAIN": 10,
+    "DOMAIN-SUFFIX": 20,
+    "DOMAIN-KEYWORD": 30,
+    "DOMAIN-REGEX": 40,
+    "IP-CIDR": 50,
+    "IP-CIDR6": 50,
+    "PROCESS-NAME": 60,
+    "AND": 70,
+    "OR": 70,
+    "NOT": 70,
+}
 
 
 class ConversionError(ValueError):
@@ -179,6 +191,11 @@ def extract_rule_type(expression: str) -> str:
     return parts[0].strip().upper()
 
 
+def sort_rule_entry(entry: tuple[str, int, str]) -> tuple[int, str, int]:
+    rule_type, line_number, _ = entry
+    return (RULE_TYPE_ORDER.get(rule_type, 999), rule_type, line_number)
+
+
 def convert_lsr_content(content: str, source_name: str) -> tuple[dict[str, Any], list[str]]:
     rules: list[dict[str, Any]] = []
     grouped_simple_rules: list[dict[str, Any]] = []
@@ -201,7 +218,7 @@ def convert_lsr_content(content: str, source_name: str) -> tuple[dict[str, Any],
 
         normalized_entries.append((rule_type, line_number, normalized_line))
 
-    for _, line_number, normalized_line in sorted(normalized_entries, key=lambda entry: (entry[0], entry[1])):
+    for _, line_number, normalized_line in sorted(normalized_entries, key=sort_rule_entry):
         try:
             rule, unsupported = parse_expression(normalized_line)
         except ConversionError as exc:
