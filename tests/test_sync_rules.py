@@ -114,8 +114,54 @@ class ConvertLsrContentTests(unittest.TestCase):
                         "type": "logical",
                         "mode": "and",
                         "rules": [
-                            {"domain_keyword": ["chatgpt-async-webps-prod-"]},
                             {"domain_suffix": ["azurefd.net"]},
+                            {"domain_keyword": ["chatgpt-async-webps-prod-"]},
+                        ],
+                    },
+                ],
+            },
+        )
+        self.assertEqual(unsupported, [])
+
+    def test_normalizes_logical_rules_without_changing_boolean_semantics(self) -> None:
+        payload = textwrap.dedent(
+            """
+            NOT,((DOMAIN,b.example.com))
+            OR,((DOMAIN,b.example.com),(DOMAIN,a.example.com),(DOMAIN-SUFFIX,z.example.com),(DOMAIN-SUFFIX,a.example.com),(DOMAIN,a.example.com))
+            AND,((PROCESS-NAME,zsh),(DOMAIN,b.example.com),(PROCESS-NAME,curl),(DOMAIN,a.example.com))
+            """
+        )
+
+        rule_set, unsupported = convert_lsr_content(payload, source_name="Logical.lsr")
+
+        self.assertEqual(
+            rule_set,
+            {
+                "version": 3,
+                "rules": [
+                    {
+                        "type": "logical",
+                        "mode": "and",
+                        "rules": [
+                            {"domain": ["a.example.com"]},
+                            {"domain": ["b.example.com"]},
+                            {"process_name": ["curl"]},
+                            {"process_name": ["zsh"]},
+                        ],
+                    },
+                    {
+                        "type": "logical",
+                        "mode": "or",
+                        "rules": [
+                            {"domain": ["a.example.com", "b.example.com"]},
+                            {"domain_suffix": ["a.example.com", "z.example.com"]},
+                        ],
+                    },
+                    {
+                        "type": "logical",
+                        "mode": "not",
+                        "rules": [
+                            {"domain": ["b.example.com"]},
                         ],
                     },
                 ],

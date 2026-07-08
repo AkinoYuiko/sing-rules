@@ -40,8 +40,21 @@ RULE_TYPE_ORDER = {
     "IP-CIDR6": 50,
     "PROCESS-NAME": 60,
     "AND": 70,
-    "OR": 70,
-    "NOT": 70,
+    "OR": 80,
+    "NOT": 90,
+}
+SIMPLE_FIELD_ORDER = {
+    "domain": 10,
+    "domain_suffix": 20,
+    "domain_keyword": 30,
+    "domain_regex": 40,
+    "ip_cidr": 50,
+    "process_name": 60,
+}
+LOGICAL_MODE_ORDER = {
+    "and": 70,
+    "or": 80,
+    "not": 90,
 }
 
 
@@ -123,6 +136,10 @@ def parse_expression(expression: str) -> tuple[dict[str, Any] | None, str | None
 
     if expression.startswith("AND,"):
         return parse_logical_expression("and", expression[4:].strip())
+    if expression.startswith("OR,"):
+        return parse_logical_expression("or", expression[3:].strip())
+    if expression.startswith("NOT,"):
+        return parse_logical_expression("not", expression[4:].strip())
 
     parts = [part.strip() for part in expression.split(",")]
     if len(parts) < 2:
@@ -146,8 +163,11 @@ def parse_logical_expression(mode: str, body: str) -> tuple[dict[str, Any], None
     if not is_wrapped_by_parentheses(stripped):
         raise ConversionError(f"Logical rule must wrap child rules in parentheses: {body}")
 
-    children = split_top_level(unwrap_parentheses(stripped))
-    if len(children) < 2:
+    children = split_top_level(stripped[1:-1].strip())
+    if mode == "not":
+        if len(children) != 1:
+            raise ConversionError(f"Logical NOT rule requires exactly one child rule: {body}")
+    elif len(children) < 2:
         raise ConversionError(f"Logical rule requires at least two child rules: {body}")
 
     rules: list[dict[str, Any]] = []
@@ -199,23 +219,73 @@ def sort_grouped_values(field: str, values: list[Any]) -> list[Any]:
     return unique_values
 
 
-def flush_grouped_simple_rules(grouped_rules: list[dict[str, Any]], output_rules: list[dict[str, Any]]) -> None:
-    if not grouped_rules:
-        return
+def normalize_simple_rule(rule: dict[str, Any]) -> dict[str, Any]:
+    field, values = next(iter(rule.items()))
+    return {field: sort_grouped_values(field, values)}
 
-    merged_values: dict[str, list[Any]] = {}
-    field_order: list[str] = []
-    for rule in grouped_rules:
+
+def aggregate_simple_rules(simple_rules: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped_values: dict[str, list[Any]] = {}
+    for rule in simple_rules:
         field, values = next(iter(rule.items()))
-        if field not in merged_values:
-            merged_values[field] = []
-            field_order.append(field)
-        merged_values[field].extend(values)
+        grouped_values.setdefault(field, []).extend(values)
 
-    for field in field_order:
-        output_rules.append({field: sort_grouped_values(field, merged_values[field])})
+    return [
+        {field: sort_grouped_values(field, grouped_values[field])}
+        for field in sorted(grouped_values, key=lambda item: (SIMPLE_FIELD_ORDER.get(item, 999), item))
+    ]
 
-    grouped_rules.clear()
+
+def serialize_rule(rule: dict[str, Any]) -> str:
+    return json.dumps(rule, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+
+
+def deduplicate_rules(rules: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    unique_rules: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for rule in rules:
+        serialized = serialize_rule(rule)
+        if serialized in seen:
+            continue
+        seen.add(serialized)
+        unique_rules.append(rule)
+    return unique_rules
+
+
+def simple_rule_sort_key(rule: dict[str, Any]) -> tuple[int, str]:
+    field = next(iter(rule))
+    return (SIMPLE_FIELD_ORDER.get(field, 999), serialize_rule(rule))
+
+
+def logical_rule_sort_key(rule: dict[str, Any]) -> tuple[int, str]:
+    return (LOGICAL_MODE_ORDER.get(rule["mode"], 999), serialize_rule(rule))
+
+
+def normalize_rule(rule: dict[str, Any]) -> dict[str, Any]:
+    if is_aggregatable_simple_rule(rule):
+        return normalize_simple_rule(rule)
+    return normalize_logical_rule(rule)
+
+
+def normalize_logical_rule(rule: dict[str, Any]) -> dict[str, Any]:
+    mode = rule["mode"]
+    normalized_children = [normalize_rule(child) for child in rule["rules"]]
+    simple_children = [child for child in normalized_children if is_aggregatable_simple_rule(child)]
+    logical_children = [child for child in normalized_children if not is_aggregatable_simple_rule(child)]
+
+    if mode == "or":
+        children = aggregate_simple_rules(simple_children) + sorted(deduplicate_rules(logical_children), key=logical_rule_sort_key)
+    else:
+        children = sorted(deduplicate_rules(simple_children), key=simple_rule_sort_key) + sorted(deduplicate_rules(logical_children), key=logical_rule_sort_key)
+
+    return {"type": "logical", "mode": mode, "rules": children}
+
+
+def normalize_top_level_rules(rules: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    normalized_rules = [normalize_rule(rule) for rule in rules]
+    simple_rules = [rule for rule in normalized_rules if is_aggregatable_simple_rule(rule)]
+    logical_rules = [rule for rule in normalized_rules if not is_aggregatable_simple_rule(rule)]
+    return aggregate_simple_rules(simple_rules) + sorted(deduplicate_rules(logical_rules), key=logical_rule_sort_key)
 
 
 def extract_rule_type(expression: str) -> str:
@@ -231,10 +301,8 @@ def sort_rule_entry(entry: tuple[str, int, str]) -> tuple[int, str, int]:
 
 
 def convert_lsr_content(content: str, source_name: str) -> tuple[dict[str, Any], list[str]]:
-    rules: list[dict[str, Any]] = []
-    grouped_simple_rules: list[dict[str, Any]] = []
+    parsed_rules: list[dict[str, Any]] = []
     unsupported_entries: list[str] = []
-    normalized_entries: list[tuple[str, int, str]] = []
 
     for line_number, raw_line in enumerate(content.splitlines(), start=1):
         stripped_line = raw_line.strip()
@@ -246,29 +314,16 @@ def convert_lsr_content(content: str, source_name: str) -> tuple[dict[str, Any],
             continue
 
         try:
-            rule_type = extract_rule_type(normalized_line)
-        except ConversionError as exc:
-            raise ConversionError(f"{source_name}:{line_number}: {exc}") from exc
-
-        normalized_entries.append((rule_type, line_number, normalized_line))
-
-    for _, line_number, normalized_line in sorted(normalized_entries, key=sort_rule_entry):
-        try:
             rule, unsupported = parse_expression(normalized_line)
         except ConversionError as exc:
             raise ConversionError(f"{source_name}:{line_number}: {exc}") from exc
 
         if rule is not None:
-            if is_aggregatable_simple_rule(rule):
-                grouped_simple_rules.append(rule)
-            else:
-                flush_grouped_simple_rules(grouped_simple_rules, rules)
-                rules.append(rule)
+            parsed_rules.append(rule)
         if unsupported is not None:
             unsupported_entries.append(f"{source_name}:{line_number}: {unsupported}")
 
-    flush_grouped_simple_rules(grouped_simple_rules, rules)
-    return {"version": RULE_SET_VERSION, "rules": rules}, unsupported_entries
+    return {"version": RULE_SET_VERSION, "rules": normalize_top_level_rules(parsed_rules)}, unsupported_entries
 
 
 def load_previous_manifest(output_dir: Path, manifest_name: str) -> list[Path]:
