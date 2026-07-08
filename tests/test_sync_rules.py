@@ -15,6 +15,45 @@ from tools.sync_rules import (
 
 
 class ConvertLsrContentTests(unittest.TestCase):
+    def test_sorts_grouped_values_within_each_category(self) -> None:
+        payload = textwrap.dedent(
+            """
+            DOMAIN,test.apple.com
+            DOMAIN,google.com
+            DOMAIN,apple.com
+            DOMAIN,cdn.apple.com
+            DOMAIN-SUFFIX,google.com
+            DOMAIN-SUFFIX,cdn.apple.com
+            DOMAIN-SUFFIX,apple.com
+            DOMAIN-KEYWORD,zeta
+            DOMAIN-KEYWORD,alpha
+            IP-CIDR6,2001:db8::/48
+            IP-CIDR,17.0.0.0/8
+            IP-CIDR,10.0.0.0/24
+            IP-CIDR,10.0.0.0/8
+            IP-CIDR6,2001:db8::/32
+            PROCESS-NAME,zsh
+            PROCESS-NAME,curl
+            """
+        )
+
+        rule_set, unsupported = convert_lsr_content(payload, source_name="Sorted.lsr")
+
+        self.assertEqual(
+            rule_set,
+            {
+                "version": 3,
+                "rules": [
+                    {"domain": ["apple.com", "cdn.apple.com", "test.apple.com", "google.com"]},
+                    {"domain_suffix": ["apple.com", "cdn.apple.com", "google.com"]},
+                    {"domain_keyword": ["alpha", "zeta"]},
+                    {"ip_cidr": ["10.0.0.0/8", "10.0.0.0/24", "17.0.0.0/8", "2001:db8::/32", "2001:db8::/48"]},
+                    {"process_name": ["curl", "zsh"]},
+                ],
+            },
+        )
+        self.assertEqual(unsupported, [])
+
     def test_converts_basic_entries_to_grouped_sing_box_rules(self) -> None:
         payload = textwrap.dedent(
             """
@@ -65,7 +104,7 @@ class ConvertLsrContentTests(unittest.TestCase):
                 "version": 3,
                 "rules": [
                     {"domain": ["example.com", "example.net"]},
-                    {"domain_suffix": ["example.org", "example.edu"]},
+                    {"domain_suffix": ["example.edu", "example.org"]},
                     {
                         "type": "logical",
                         "mode": "and",

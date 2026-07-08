@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 import re
 import subprocess
@@ -165,6 +166,35 @@ def is_aggregatable_simple_rule(rule: dict[str, Any]) -> bool:
     return "type" not in rule and len(rule) == 1
 
 
+def domain_sort_key(value: str) -> tuple[tuple[str, ...], str]:
+    labels = tuple(reversed(value.casefold().split(".")))
+    return labels, value
+
+
+def keyword_sort_key(value: str) -> str:
+    return value.casefold()
+
+
+def ip_cidr_sort_key(value: str) -> tuple[int, int, int, str]:
+    try:
+        network = ipaddress.ip_network(value, strict=False)
+    except ValueError:
+        address = ipaddress.ip_address(value)
+        max_prefix = 32 if address.version == 4 else 128
+        network = ipaddress.ip_network(f"{value}/{max_prefix}", strict=False)
+    return (network.version, int(network.network_address), network.prefixlen, value)
+
+
+def sort_grouped_values(field: str, values: list[Any]) -> list[Any]:
+    if field in {"domain", "domain_suffix"}:
+        return sorted(values, key=domain_sort_key)
+    if field in {"domain_keyword", "domain_regex", "process_name"}:
+        return sorted(values, key=keyword_sort_key)
+    if field == "ip_cidr":
+        return sorted(values, key=ip_cidr_sort_key)
+    return values
+
+
 def flush_grouped_simple_rules(grouped_rules: list[dict[str, Any]], output_rules: list[dict[str, Any]]) -> None:
     if not grouped_rules:
         return
@@ -179,7 +209,7 @@ def flush_grouped_simple_rules(grouped_rules: list[dict[str, Any]], output_rules
         merged_values[field].extend(values)
 
     for field in field_order:
-        output_rules.append({field: merged_values[field]})
+        output_rules.append({field: sort_grouped_values(field, merged_values[field])})
 
     grouped_rules.clear()
 
