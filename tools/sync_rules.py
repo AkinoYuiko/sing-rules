@@ -95,8 +95,6 @@ def split_top_level(text: str) -> list[str]:
 
 
 def normalize_value(rule_type: str, value: str) -> str:
-    if rule_type == "DOMAIN-SUFFIX" and not value.startswith("."):
-        return f".{value}"
     return value
 
 
@@ -174,10 +172,18 @@ def flush_grouped_simple_rules(grouped_rules: list[dict[str, Any]], output_rules
     grouped_rules.clear()
 
 
+def extract_rule_type(expression: str) -> str:
+    parts = expression.split(",", 1)
+    if not parts or not parts[0].strip():
+        raise ConversionError(f"Malformed rule expression: {expression}")
+    return parts[0].strip().upper()
+
+
 def convert_lsr_content(content: str, source_name: str) -> tuple[dict[str, Any], list[str]]:
     rules: list[dict[str, Any]] = []
     grouped_simple_rules: list[dict[str, Any]] = []
     unsupported_entries: list[str] = []
+    normalized_entries: list[tuple[str, int, str]] = []
 
     for line_number, raw_line in enumerate(content.splitlines(), start=1):
         stripped_line = raw_line.strip()
@@ -188,6 +194,14 @@ def convert_lsr_content(content: str, source_name: str) -> tuple[dict[str, Any],
         if not normalized_line:
             continue
 
+        try:
+            rule_type = extract_rule_type(normalized_line)
+        except ConversionError as exc:
+            raise ConversionError(f"{source_name}:{line_number}: {exc}") from exc
+
+        normalized_entries.append((rule_type, line_number, normalized_line))
+
+    for _, line_number, normalized_line in sorted(normalized_entries, key=lambda entry: (entry[0], entry[1])):
         try:
             rule, unsupported = parse_expression(normalized_line)
         except ConversionError as exc:

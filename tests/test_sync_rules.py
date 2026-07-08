@@ -37,8 +37,8 @@ class ConvertLsrContentTests(unittest.TestCase):
                 "version": 3,
                 "rules": [
                     {"domain": ["example.com", "example.net"]},
-                    {"domain_suffix": [".example.org"]},
                     {"domain_keyword": ["openai"]},
+                    {"domain_suffix": ["example.org"]},
                     {"ip_cidr": ["10.0.0.0/24", "2001:db8::/32"]},
                     {"process_name": ["curl"]},
                 ],
@@ -46,13 +46,14 @@ class ConvertLsrContentTests(unittest.TestCase):
         )
         self.assertEqual(unsupported, [])
 
-    def test_converts_and_rules_to_logical_rules(self) -> None:
+    def test_sorts_by_rule_type_before_grouping_simple_rules(self) -> None:
         payload = textwrap.dedent(
             """
-            DOMAIN,example.com
-            DOMAIN,example.net
-            AND,((DOMAIN-KEYWORD,chatgpt-async-webps-prod-),(DOMAIN-SUFFIX,azurefd.net))
+            DOMAIN,example.com // comment
             DOMAIN-SUFFIX,example.org
+            AND,((DOMAIN-KEYWORD,chatgpt-async-webps-prod-),(DOMAIN-SUFFIX,azurefd.net))
+            DOMAIN,example.net
+            DOMAIN-SUFFIX,example.edu
             """
         )
 
@@ -63,16 +64,16 @@ class ConvertLsrContentTests(unittest.TestCase):
             {
                 "version": 3,
                 "rules": [
-                    {"domain": ["example.com", "example.net"]},
                     {
                         "type": "logical",
                         "mode": "and",
                         "rules": [
                             {"domain_keyword": ["chatgpt-async-webps-prod-"]},
-                            {"domain_suffix": [".azurefd.net"]},
+                            {"domain_suffix": ["azurefd.net"]},
                         ],
                     },
-                    {"domain_suffix": [".example.org"]},
+                    {"domain": ["example.com", "example.net"]},
+                    {"domain_suffix": ["example.org", "example.edu"]},
                 ],
             },
         )
