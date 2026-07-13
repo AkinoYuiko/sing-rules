@@ -49,10 +49,12 @@ class ConvertLsrContentTests(unittest.TestCase):
             {
                 "version": 3,
                 "rules": [
-                    {"domain": ["apple.com", "cdn.apple.com", "google.com", "test.apple.com"]},
-                    {"domain_suffix": ["apple.com", "cdn.apple.com", "google.com"]},
-                    {"domain_keyword": ["alpha", "zeta"]},
-                    {"ip_cidr": ["10.0.0.0/8", "10.0.0.0/24", "17.0.0.0/8", "2001:db8::/32", "2001:db8::/48"]},
+                    {
+                        "domain": ["apple.com", "cdn.apple.com", "google.com", "test.apple.com"],
+                        "domain_suffix": ["apple.com", "cdn.apple.com", "google.com"],
+                        "domain_keyword": ["alpha", "zeta"],
+                        "ip_cidr": ["10.0.0.0/8", "10.0.0.0/24", "17.0.0.0/8", "2001:db8::/32", "2001:db8::/48"],
+                    },
                     {"process_name": ["curl", "zsh"]},
                 ],
             },
@@ -80,10 +82,12 @@ class ConvertLsrContentTests(unittest.TestCase):
             {
                 "version": 3,
                 "rules": [
-                    {"domain": ["example.com", "example.net"]},
-                    {"domain_suffix": ["example.org"]},
-                    {"domain_keyword": ["openai"]},
-                    {"ip_cidr": ["10.0.0.0/24", "2001:db8::/32"]},
+                    {
+                        "domain": ["example.com", "example.net"],
+                        "domain_suffix": ["example.org"],
+                        "domain_keyword": ["openai"],
+                        "ip_cidr": ["10.0.0.0/24", "2001:db8::/32"],
+                    },
                     {"process_name": ["curl"]},
                 ],
             },
@@ -108,8 +112,10 @@ class ConvertLsrContentTests(unittest.TestCase):
             {
                 "version": 3,
                 "rules": [
-                    {"domain": ["example.com", "example.net"]},
-                    {"domain_suffix": ["example.edu", "example.org"]},
+                    {
+                        "domain": ["example.com", "example.net"],
+                        "domain_suffix": ["example.edu", "example.org"],
+                    },
                     {
                         "type": "logical",
                         "mode": "and",
@@ -153,8 +159,10 @@ class ConvertLsrContentTests(unittest.TestCase):
                         "type": "logical",
                         "mode": "or",
                         "rules": [
-                            {"domain": ["a.example.com", "b.example.com"]},
-                            {"domain_suffix": ["a.example.com", "z.example.com"]},
+                            {
+                                "domain": ["a.example.com", "b.example.com"],
+                                "domain_suffix": ["a.example.com", "z.example.com"],
+                            },
                         ],
                     },
                     {
