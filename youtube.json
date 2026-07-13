@@ -1,0 +1,22 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "yt3.googleusercontent.com"
+      ],
+      "domain_suffix": [
+        "ggpht.com",
+        "googlevideo.com",
+        "gvt2.com",
+        "video.google.com",
+        "youtu.be",
+        "yt.be",
+        "ytimg.com"
+      ],
+      "domain_keyword": [
+        "youtube"
+      ]
+    }
+  ]
+}

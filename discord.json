@@ -1,0 +1,33 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "discord-attachments-uploads-prd.storage.googleapis.com",
+        "hammerandchisel.ssl.zendesk.com"
+      ],
+      "domain_suffix": [
+        "dis.gd",
+        "discord-activities.com",
+        "discord.co",
+        "discord.com",
+        "discord.design",
+        "discord.dev",
+        "discord.gg",
+        "discord.gift",
+        "discord.gifts",
+        "discord.media",
+        "discord.new",
+        "discord.store",
+        "discord.tools",
+        "discordactivities.com",
+        "discordapp.com",
+        "discordapp.net",
+        "discordmerch.com",
+        "discordpartygames.com",
+        "discordsays.com",
+        "discordstatus.com"
+      ]
+    }
+  ]
+}

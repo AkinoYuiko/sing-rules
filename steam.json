@@ -1,0 +1,50 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "a4e8s8k3.map2.ssl.hwcdn.net",
+        "f3b7q2p3.ssl.hwcdn.net",
+        "steambroadcast.akamaized.net",
+        "steamcdn-a.akamaihd.net",
+        "steamcloudsweden.blob.core.windows.net",
+        "steamcommunity-a.akamaihd.net",
+        "steamcommunity-a.akamaihd.net.edgesuite.net",
+        "steammobile.akamaized.net",
+        "steampipe-kr.akamaized.net",
+        "steampipe-partner.akamaized.net",
+        "steampipe.akamaized.net",
+        "steamstore-a.akamaihd.net",
+        "steamusercontent-a.akamaihd.net",
+        "steamuserimages-a.akamaihd.net",
+        "steamvideo-a.akamaihd.net"
+      ],
+      "domain_suffix": [
+        "edge.steam-dns.top.comcast.net",
+        "playartifact.com",
+        "s.team",
+        "steam-api.com",
+        "steam-chat.com",
+        "steam.cdn.on.net",
+        "steam.cdn.orcon.net.nz",
+        "steam.cdn.slingshot.co.nz",
+        "steam.cdn.webra.ru",
+        "steam.tv",
+        "steamcommunity.com",
+        "steamcontent.com",
+        "steamdeck.com",
+        "steamgames.com",
+        "steampowered.com",
+        "steamserver.net",
+        "steamstatic.com",
+        "steamusercontent.com",
+        "team.apac.qtlglb.com",
+        "team.eca.qtlglb.com",
+        "team.naeu.qtlglb.com",
+        "team.ru.qtlglb.com",
+        "underlords.com",
+        "valvesoftware.com"
+      ]
+    }
+  ]
+}
