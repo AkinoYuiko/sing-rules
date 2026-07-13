@@ -51,6 +51,10 @@ SIMPLE_FIELD_ORDER = {
     "ip_cidr": 50,
     "process_name": 60,
 }
+# Fields in each group are ORed by sing-box within one default headless rule.
+SIMPLE_FIELD_OR_GROUPS = (
+    ("domain", "domain_suffix", "domain_keyword", "domain_regex", "ip_cidr"),
+)
 LOGICAL_MODE_ORDER = {
     "and": 70,
     "or": 80,
@@ -230,10 +234,25 @@ def aggregate_simple_rules(simple_rules: list[dict[str, Any]]) -> list[dict[str,
         field, values = next(iter(rule.items()))
         grouped_values.setdefault(field, []).extend(values)
 
-    return [
-        {field: sort_grouped_values(field, grouped_values[field])}
-        for field in sorted(grouped_values, key=lambda item: (SIMPLE_FIELD_ORDER.get(item, 999), item))
-    ]
+    aggregated_rules: list[dict[str, Any]] = []
+    grouped_fields: set[str] = set()
+    for field_group in SIMPLE_FIELD_OR_GROUPS:
+        compound_rule = {
+            field: sort_grouped_values(field, grouped_values[field])
+            for field in field_group
+            if field in grouped_values
+        }
+        if compound_rule:
+            aggregated_rules.append(compound_rule)
+            grouped_fields.update(compound_rule)
+
+    for field in sorted(
+        grouped_values.keys() - grouped_fields,
+        key=lambda item: (SIMPLE_FIELD_ORDER.get(item, 999), item),
+    ):
+        aggregated_rules.append({field: sort_grouped_values(field, grouped_values[field])})
+
+    return aggregated_rules
 
 
 def serialize_rule(rule: dict[str, Any]) -> str:
